@@ -1,0 +1,2 @@
+this is the script we are using for classification tasks. To be specific, data_processing.py is the script for process data so you may want to change the data path declared in that file. network.py and resnet.py is the network structure, you might want to change the num_classes in network.py in line self.model = resnet18(num_classes=… train.py is the training schedule and the main entrance of the program. You might want to reduce some loops to speed up.
+To start, please first run data_processing.py file to process the data to pickle files then use train.py
