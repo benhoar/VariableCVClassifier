@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 class Resnet50:
     def __init__(self, device='cuda') -> None:
         self.device = device
-        self.model = resnet18(num_classes=5).to(self.device)
+        self.model = resnet18(num_classes=3).to(self.device)
         self.loss_fn = nn.CrossEntropyLoss()
         self.optimizer = torch.optim.Adam(self.model.parameters(),weight_decay=1e-5)
     
