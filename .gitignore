@@ -1,4 +1,9 @@
 scratchpad.ipynb
 .DS_store
-./classification
-./errorfolder
+classification
+errorfolder
+__pycache__
+log_models
+lin_models
+mixed_models
+test

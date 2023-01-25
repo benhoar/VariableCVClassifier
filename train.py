@@ -14,12 +14,12 @@ from tqdm import tqdm
 
 if __name__ == "__main__":
     lcl_device='cuda'
-    data_type = 'linear'
+    data_type = 'mixed'
     for i in range(8):
         # 0.1 training noise
         training_noise = 0.1
         train, test, _, _ = load_data(
-            train_batch_size=256, test_batch_size=3500, train_size=3000, 
+            train_batch_size=256, test_batch_size=3000, train_size=2500, 
             n_crv=6, noise_mag=0, noise_mag_train=training_noise)
         model = Resnet50(device=lcl_device)
         model.fit(train, epoch=40) 
@@ -30,7 +30,7 @@ if __name__ == "__main__":
         # 0.01 training noise
         training_noise = 0.01
         train, test, _, _ = load_data(
-            train_batch_size=256, test_batch_size=3500, train_size=3000, 
+            train_batch_size=256, test_batch_size=3000, train_size=2500, 
             n_crv=6, noise_mag=0, noise_mag_train=training_noise)
         model = Resnet50(device=lcl_device)
         model.fit(train, epoch=40) 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
         # 0 training noise
         training_noise = 0
         train, test, _, _ = load_data(
-            train_batch_size=256, test_batch_size=3500, train_size=3000, 
+            train_batch_size=256, test_batch_size=3000, train_size=2500, 
             n_crv=6, noise_mag=0, noise_mag_train=training_noise)
         model = Resnet50(device=lcl_device)
         model.fit(train, epoch=40) 

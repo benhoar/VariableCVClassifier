@@ -1,7 +1,9 @@
 import os
 import shutil
+import re
 import numpy as np
 import cv2
+import math
 import torch
 import pickle
 from tqdm import tqdm
@@ -11,22 +13,33 @@ from matplotlib import pyplot as plt
 
 length = 1000
 folder = { 
-           'EC1':'D:/CV_Project_2/9ModelData/EC1/lin_srs/',
-           'E':'D:/CV_Project_2/9ModelData/E/lin_srs/',
-           'ECP': 'D:/CV_Project_2/9ModelData/ECP/lin_srs/'
+           'EC1':'D:/CV_Project_2/9ModelData/EC1/',
+           'E':'D:/CV_Project_2/9ModelData/E/',
+           'ECP': 'D:/CV_Project_2/9ModelData/ECP/'
          }
 
+def __getdatafiles(path):
+    res = []
+    for next in os.scandir(path):
+        if next.is_dir():
+            res.extend(__getdatafiles(next))
+        elif re.match(r".*[A-Z]+_[0-9]+.txt", next.path):
+            res.append(next)
+    return res
 
 if __name__ == "__main__":
     for j, e in enumerate(folder.keys()):
-        dirlist = os.listdir(folder[e])
-        dirlist = [file for file in dirlist if file.endswith('txt')]
+        dirlist = __getdatafiles(folder[e])
         dataset = []
         print('Now Handling {} with {} samples'.format(e, len(dirlist)))
+        count = 0
         for f in tqdm(dirlist):
             try: 
-                read = np.genfromtxt(folder[e] + f, skip_header=1, delimiter=',')
+                read = np.genfromtxt(f.path, skip_header=1, delimiter=',')
                 scan_rate, scan_rate_idx = np.unique(read[:, 2], return_index=True)
+                if math.log10(max(scan_rate)) - math.log10(min(scan_rate)) > 2:
+                    raise Exception("SR too large")
+                count += 1
                 mat_val = cv2.resize(
                     np.vstack([x[:, 1] for x in np.split(read, scan_rate_idx[1:])]), (length, 6))
                 mat_scan = np.tile(scan_rate, (length // 2, 1)).T
@@ -34,11 +47,12 @@ if __name__ == "__main__":
                 mat_val2 = mat_val[:, :-(length // 2 + 1):-1]
                 mat = np.stack((mat_val1, mat_val2, mat_scan), axis=1)
                 dataset.append({'data': torch.tensor(
-                    mat, dtype=torch.float32), 'label': e, 'file': f, 'key': j})
+                    mat, dtype=torch.float32), 'label': e, 'file': f.name, 'key': j})
             except:
-                shutil.move(folder[e] + f, f'D:/CVClassify/errorfolder/{e}/{f}')
+                continue
         with open('D:/CVClassify/classification/{}.pkl'.format(e), 'wb') as f:
             pickle.dump(dataset, f)
+        print('{} count is {}'.format(e, count))
 
 
 # deleted mask_sr variable of Data class because data is now separated into 
